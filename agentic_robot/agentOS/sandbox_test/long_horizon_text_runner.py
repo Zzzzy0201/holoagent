@@ -88,7 +88,7 @@ class LongHorizonTextRunner:
     _ARM_SKILL_WAIT_SEC = 8.0
     _DAG_EXECUTOR_MAX_WORKERS = 8
 
-    def __init__(self, mode: str = "single_robot", dry_run: bool = False, output_root: Optional[Path] = None) -> None:
+    def __init__(self, mode: str, dry_run: bool = False, output_root: Optional[Path] = None) -> None:
         self.mode = mode
         self.dry_run = dry_run
         self.output_root = output_root or DEFAULT_OUTPUT_ROOT
@@ -833,7 +833,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="纯文本长指令 DAG 执行器")
     parser.add_argument("--instruction", required=True, help="纯文本长指令")
     parser.add_argument(
-        "--mode", choices=["single_robot", "multi_robot"], required=True)
+        "--mode", choices=["single_robot", "multi_robot"], required=False, default="single_robot")
     parser.add_argument("--dry-run", action="store_true", help="仅做规划和虚拟执行验证")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT))
     return parser
