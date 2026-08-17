@@ -835,7 +835,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--mode", choices=["single_robot", "multi_robot"], required=False, default="single_robot")
     parser.add_argument("--dry-run", action="store_true", help="仅做规划和虚拟执行验证")
-    parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT))
+    parser.add_argument("--output-root", default="output")
     return parser
 
 
