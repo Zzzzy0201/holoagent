@@ -89,7 +89,7 @@ class LongHorizonTextRunner:
     _DAG_EXECUTOR_MAX_WORKERS = 8
 
     def __init__(self, mode: str, dry_run: bool = False, output_root: Optional[Path] = None) -> None:
-        self.mode = mode
+        self.mode = single_robot
         self.dry_run = dry_run
         self.output_root = output_root or DEFAULT_OUTPUT_ROOT
         self.output_root.mkdir(parents=True, exist_ok=True)
