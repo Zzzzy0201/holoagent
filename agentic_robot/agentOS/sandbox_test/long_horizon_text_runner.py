@@ -88,8 +88,8 @@ class LongHorizonTextRunner:
     _ARM_SKILL_WAIT_SEC = 8.0
     _DAG_EXECUTOR_MAX_WORKERS = 8
 
-    def __init__(self, mode: str, dry_run: bool = False, output_root: Optional[Path] = None) -> None:
-        self.mode = single_robot
+    def __init__(self, mode: str = "single_robot", dry_run: bool = False, output_root: Optional[Path] = None) -> None:
+        self.mode = mode
         self.dry_run = dry_run
         self.output_root = output_root or DEFAULT_OUTPUT_ROOT
         self.output_root.mkdir(parents=True, exist_ok=True)
@@ -843,7 +843,7 @@ def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
     runner = LongHorizonTextRunner(
-        mode="singel_robot",
+        mode="single_robot",
         dry_run=args.dry_run,
         output_root=Path(args.output_root),
     )
