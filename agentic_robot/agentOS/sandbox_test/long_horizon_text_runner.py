@@ -171,11 +171,11 @@ class LongHorizonTextRunner:
         self._write_yaml(self.monitor_path, self.monitor)
 
     def _build_llm_client(self):
-        gpt_provider = os.getenv("GPT_PROVIDER", "azure").strip().lower()
+        gpt_provider = os.getenv("GPT_PROVIDER", "openai").strip().lower()
         gpt_api_key = (
             os.getenv("AZURE_OPENAI_API_KEY")
             if gpt_provider == "azure"
-            else os.getenv("OPENAI_API_KEY")
+            else os.getenv("OPENAI_API_KEY", "sk-ws-H.EPHXPMM.cHeu.MEQCIC2wD6WCXNdbZXblzjubk5-ExUNUshynEDcvawDBVorTAiAS8Xn0UwMNS7Cx2bgoFZt_D4cmReDVI3joEk8XXT6HJg")
         )
         if not gpt_api_key:
             raise RuntimeError(
@@ -199,14 +199,15 @@ class LongHorizonTextRunner:
             )
             return client, gpt_model
 
-        gpt_model = os.getenv("OPENAI_MODEL", "gpt-4o")
-        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv(
-            "OPENAI_BASE_URL") or None)
+        gpt_model = os.getenv("GPT_MODEL", "qwen3.7-flash")
+        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv("GPT_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1" or None)
         return client, gpt_model
 
     def _write_yaml(self, path: Path, data: dict) -> None:
         path.write_text(yaml.safe_dump(data, allow_unicode=True,
                         sort_keys=False), encoding="utf-8")
+        if path.name=="dag_plan.yaml":
+            print(yaml.safe_dump(data, allow_unicode=True, sort_keys=False))
 
     def _append_event(self, event_type: str, payload: dict) -> None:
         self.monitor["events"].append(
@@ -842,7 +843,7 @@ def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
     runner = LongHorizonTextRunner(
-        mode=args.mode,
+        mode="singel_robot",
         dry_run=args.dry_run,
         output_root=Path(args.output_root),
     )
