@@ -260,7 +260,7 @@ class LongHorizonTextRunner:
 
 字段约束：
 - id: 字符串，必须唯一
-- robot_id: 整数，必须是 11/12/13/14/15/16 之一
+- robot_id: 整数
 - skill: 只能是 "navigation" 或 "arm"
 - target:
   - skill="navigation" 时只能是 {sorted(self.supported_navigation_targets)}
