@@ -200,7 +200,7 @@ class LongHorizonTextRunner:
             return client, gpt_model
 
         gpt_model = os.getenv("GPT_MODEL", "qwen3.7-flash")
-        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv("GPT_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1" or None)
+        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv("GPT_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1") or None)
         return client, gpt_model
 
     def _write_yaml(self, path: Path, data: dict) -> None:
