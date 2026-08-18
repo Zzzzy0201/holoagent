@@ -122,6 +122,16 @@ class LongHorizonTextRunner:
             "one_point_3",
             "one_point_4",
             "stop",
+            "people",
+            "apple",
+            "mango",
+            "blueberry",
+            "banana",
+            "basket",
+            "cola",
+            "coffee",
+            "tea",
+            "juice",
         }
         self.supported_arm_targets = {
             "release_arm",
@@ -148,6 +158,7 @@ class LongHorizonTextRunner:
             "right_hand_on_heart",
             "both_hands_up_deviate_right",
             "forward_push",
+            "pick",
         }
 
         self.client, self.gpt_model = self._build_llm_client()
