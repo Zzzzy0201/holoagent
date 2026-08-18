@@ -341,11 +341,6 @@ class LongHorizonTextRunner:
 
             dag = json.loads(content)
             normalized = self._validate_and_normalize_dag(dag)
-            if not normalized:
-                fail_reason = self._diagnose_failure(dag)
-                print(f"\n>>> [规划失败诊断] {fail_reason}")
-                self._append_event("dag_validation_failed", {"reason": fail_reason})
-                return None
             self._write_yaml(
                 self.plan_path,
                 {
@@ -874,39 +869,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--execute", action="store_true", help="真正执行物理动作")
     parser.add_argument("--output-root", default="output")
     return parser
-
-def _diagnose_failure(self, dag: dict) -> str:
-    """分析原始 DAG，诊断校验失败是因为 LLM 没理解，还是词库没覆盖"""
-    if not dag or not dag.get("nodes"):
-        return "LLM 未理解指令：未生成节点"
-    
-    nodes = dag.get("nodes", [])
-    if not isinstance(nodes, list) or len(nodes) == 0:
-        return "LLM 未理解指令：节点列表为空"
-    
-    for node in nodes:
-        skill = node.get("skill")
-        target = node.get("target")
-        robot_id = node.get("robot_id")
-        
-        # 1. 检查技能类型是否非法
-        if skill not in {"navigation", "arm"}:
-            return f"LLM 理解了意图，但生成了非法技能 '{skill}'（仅支持 navigation/arm）"
-        
-        # 2. 检查导航目标是否不在词库里（这是最常见的“词库未覆盖”）
-        if skill == "navigation" and target not in self.supported_navigation_targets:
-            return f"LLM 理解了导航意图，但目标点位 '{target}' 不在当前词库中（建议补充别名）"
-        
-        # 3. 检查手臂动作是否不在词库里
-        if skill == "arm" and target not in self.supported_arm_targets:
-            return f"LLM 理解了手臂动作意图，但动作名称 '{target}' 不在当前词库中（建议补充动作）"
-      
-    
-    # 6. 检查是否有循环依赖
-    if self._has_cycle(nodes):
-        return "LLM 理解了意图，但生成的依赖关系存在循环（A 依赖 B，B 又依赖 A）"
-    
-    return "未知校验失败，建议检查 LLM 输出结构是否完整"
 
 
 def main() -> int:
