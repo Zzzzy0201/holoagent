@@ -834,7 +834,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--instruction", required=True, help="纯文本长指令")
     parser.add_argument(
         "--mode", choices=["single_robot", "multi_robot"], required=False, default="single_robot")
-    parser.add_argument("--dry-run", action="store_true", help="仅做规划和虚拟执行验证")
+    parser.add_argument("--execute", action="store_true", help="真正执行物理动作")
     parser.add_argument("--output-root", default="output")
     return parser
 
@@ -844,7 +844,7 @@ def main() -> int:
     args = parser.parse_args()
     runner = LongHorizonTextRunner(
         mode="single_robot",
-        dry_run=args.dry_run,
+        dry_run=not args.execute,
         output_root=Path(args.output_root),
     )
     return runner.run(args.instruction)
