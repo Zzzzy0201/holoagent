@@ -125,6 +125,7 @@ class LongHorizonTextRunner:
             "start_position",
             "apple_1",
             "apple_2",
+            "apple_3",
             "mango",
             "blueberry",
             "banana",
