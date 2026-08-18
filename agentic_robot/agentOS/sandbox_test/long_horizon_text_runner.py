@@ -260,12 +260,11 @@ class LongHorizonTextRunner:
 
 字段约束：
 - id: 字符串，必须唯一
-- robot_id: 整数
+- robot_id: 整数,默认为机器人1
 - skill: 只能是 "navigation" 或 "arm"
 - target:
-   根据任务自行分解
-  # - skill="navigation" 时只能是 {sorted(self.supported_navigation_targets)}
-  # - skill="arm" 时只能是 {sorted(self.supported_arm_targets)}
+  - skill="navigation" 时只能是 {sorted(self.supported_navigation_targets)}
+  - skill="arm" 时只能是 {sorted(self.supported_arm_targets)}
 - depends_on: 字符串数组，没有依赖时必须输出 []
 - “同时”表示并行，不要互相依赖
 - “然后”“之后”“完成后”“到达后”表示建立依赖
@@ -362,12 +361,12 @@ class LongHorizonTextRunner:
 
             # if robot_id not in self.robot_urls:
             #     return None
-            # if skill not in {"navigation", "arm"}:
-            #     return None
-            # if skill == "navigation" and target not in self.supported_navigation_targets:
-            #     return None
-            # if skill == "arm" and target not in self.supported_arm_targets:
-            #     return None
+            if skill not in {"navigation", "arm"}:
+                return None
+            if skill == "navigation" and target not in self.supported_navigation_targets:
+                return None
+            if skill == "arm" and target not in self.supported_arm_targets:
+                return None
             if not isinstance(depends_on, list):
                 return None
 
