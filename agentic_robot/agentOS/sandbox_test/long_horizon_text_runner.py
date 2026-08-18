@@ -188,7 +188,10 @@ class LongHorizonTextRunner:
         gpt_api_key = (
             os.getenv("AZURE_OPENAI_API_KEY")
             if gpt_provider == "azure"
-            else os.getenv("OPENAI_API_KEY", "sk-ws-H.EPHXPMM.cHeu.MEQCIC2wD6WCXNdbZXblzjubk5-ExUNUshynEDcvawDBVorTAiAS8Xn0UwMNS7Cx2bgoFZt_D4cmReDVI3joEk8XXT6HJg")
+            # 千问3.7flash
+            #else os.getenv("OPENAI_API_KEY", "sk-ws-H.EPHXPMM.cHeu.MEQCIC2wD6WCXNdbZXblzjubk5-ExUNUshynEDcvawDBVorTAiAS8Xn0UwMNS7Cx2bgoFZt_D4cmReDVI3joEk8XXT6HJg")
+            #千问3.7plus
+            else os.getenv("OPENAI_API_KEY", "sk-ws-H.EPLEYML.PMCe.MEUCIQCslITrqsSR3RbD9smFs30HBbNQaRGtSnKdjA78B5dUwwIgZDIe7mcIV-aYBU-_sf7hdH9BAj6-u3UrkMNKGBmk6qA")
         )
         if not gpt_api_key:
             raise RuntimeError(
