@@ -122,7 +122,7 @@ class LongHorizonTextRunner:
             "one_point_3",
             "one_point_4",
             "stop",
-            "people",
+            "start_position",
             "apple",
             "mango",
             "blueberry",
@@ -132,6 +132,8 @@ class LongHorizonTextRunner:
             "coffee",
             "tea",
             "juice",
+            "people_1",
+            "people_2",
         }
         self.supported_arm_targets = {
             "release_arm",
@@ -158,7 +160,7 @@ class LongHorizonTextRunner:
             "right_hand_on_heart",
             "both_hands_up_deviate_right",
             "forward_push",
-            "pick",
+            "put_in_basket",
         }
 
         self.client, self.gpt_model = self._build_llm_client()
@@ -282,6 +284,17 @@ class LongHorizonTextRunner:
 - 不要凭空增加用户未提及的动作
 - 如果无法可靠映射，输出 {{"description": "unrecognized", "nodes": []}}
 - {mode_rule}
+
+高级语义分解规则:
+- 当指令包含“拿取”、“取回”、“拿来”、“拿东西”、“取物”等含义时，分解必须包含四个串行节点：
+  1. 导航到目标位置（navigation）
+  2. 执行手臂抓取动作（arm，target 使用 "clamp"）
+  3. 导航至返回点（若无指定，默认“start_position”)
+  4. 执行手臂放下动作（arm, target为“release_arm")
+- 当指令包含“把物体从A移到B”时，分解为：导航到A → 抓取 → 导航到B → 放下。
+- 当指令包含“回来”、“返回”等词时，必须有对应的导航节点回到原位置或指定点。
+- 如果指令中没有明确返回点，且动作需要取物，则默认返回至当前所在位置（"start_position")。
+- 如果一次需要拿取的物品个数超过一件时，需要先拿篮子（navigation,clamp)，并将后续物品都放在篮子里(navigation,clamp,put_in_basket)，然后将篮子交给对象（navigation,release_arm)
 
 单机长指令样例：
 {json.dumps(SINGLE_ROBOT_TEST_CASES, ensure_ascii=False, indent=2)}
