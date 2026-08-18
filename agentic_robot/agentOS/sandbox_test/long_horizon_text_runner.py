@@ -123,7 +123,8 @@ class LongHorizonTextRunner:
             "one_point_4",
             "stop",
             "start_position",
-            "apple",
+            "apple_1",
+            "apple_2",
             "mango",
             "blueberry",
             "banana",
@@ -136,13 +137,15 @@ class LongHorizonTextRunner:
             "people_2",
         }
         self.supported_arm_targets = {
-            "release_arm",
+            "release_arm_left",
+            "release_arm_right",
             "turn_back_wave",
             "blow_kiss_with_both_hands",
             "blow_kiss_with_left_hand",
             "blow_kiss_with_right_hand",
             "both_hands_up",
-            "clamp",
+            "clamp_left",
+            "clamp_right",
             "high_five",
             "hug",
             "make_heart_with_both_hands",
@@ -160,7 +163,8 @@ class LongHorizonTextRunner:
             "right_hand_on_heart",
             "both_hands_up_deviate_right",
             "forward_push",
-            "put_in_basket",
+            "put_in_basket_left",
+            "put_in_basket_right",
         }
 
         self.client, self.gpt_model = self._build_llm_client()
@@ -286,20 +290,17 @@ class LongHorizonTextRunner:
 - depends_on: 字符串数组，没有依赖时必须输出 []
 - “同时”表示并行，不要互相依赖
 - “然后”“之后”“完成后”“到达后”表示建立依赖
-- 不要凭空增加用户未提及的动作
+- 如果用户没有具体的动作要求，请根据用户的需求和指令分析并执行能满足用户需求的动作，如果用户有具体的动作要求，请不要凭空添加用户未提及的动作
 - 如果无法可靠映射，输出 {{"description": "unrecognized", "nodes": []}}
 - {mode_rule}
 
 高级语义分解规则:
-- 当指令包含“拿取”、“取回”、“拿来”、“拿东西”、“取物”、“我想要一个东西” 等含义时，分解必须包含四个串行节点：
-  1. 导航到目标位置（navigation）
-  2. 执行手臂抓取动作（arm，target 使用 "clamp"）
-  3. 导航至返回点（若无指定，默认“start_position”)
-  4. 执行手臂放下动作（arm, target为“release_arm")
+- 当指令包含“拿取”、“取回”、“拿来”、“拿东西”、“取物”、“我想要一个东西”、“给我一个东西” 等含义时，分解必须包含四个串行节点：导航至物体(navigation)->抓取物体(clamp)->导航至目标返回点(navigation)->放下物体(release_arm)。
 - 当指令包含“把物体从A移到B”时，分解为：导航到A → 抓取 → 导航到B → 放下。
 - 当指令包含“回来”、“返回”等词时，必须有对应的导航节点回到原位置或指定点。
 - 如果指令中没有明确返回点或者说拿给我，且动作需要取物，则默认返回至当前所在位置（"start_position")，如果有指定要拿给谁，则返回点为人物所在位置，如果指定拿到哪里，则返回点为该地点。
-- 如果一次需要拿取的物品个数超过一件时，需要先拿篮子（navigation,clamp)，并将后续物品都放在篮子里(navigation,clamp,put_in_basket)，然后将篮子交给对象（navigation,release_arm)
+- 如果一次需要拿取的物品个数超过一件时，需要先拿篮子（navigation,clamp)，并将后续物品都放在篮子里(navigation,clamp,put_in_basket)，然后将篮子交给对象（navigation,release_arm)。
+- 注意左右手协调。
 
 单机长指令样例：
 {json.dumps(SINGLE_ROBOT_TEST_CASES, ensure_ascii=False, indent=2)}
