@@ -301,6 +301,8 @@ class LongHorizonTextRunner:
 - 如果指令中没有明确返回点或者说拿给我，且动作需要取物，则默认返回至当前所在位置（"start_position")，如果有指定要拿给谁，则返回点为人物所在位置，如果指定拿到哪里，则返回点为该地点。
 - 如果一次需要拿取的物品个数超过一件时，需要先拿篮子（navigation,clamp)，并将后续物品都放在篮子里(navigation,clamp,put_in_basket)，然后将篮子交给对象（navigation,release_arm)。
 - 注意左右手协调。
+- 注意理解命令中隐含的先后顺序，如“先”、“再”等。
+- 没有明确指定对象时自行理解对象是谁。
 
 单机长指令样例：
 {json.dumps(SINGLE_ROBOT_TEST_CASES, ensure_ascii=False, indent=2)}
