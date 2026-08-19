@@ -299,6 +299,7 @@ class LongHorizonTextRunner:
 - 注意理解命令中隐含的先后顺序，如“先”、“再”等。
 - 没有明确指定对象时自行理解对象是谁。
 - 默认当前用户所在的位置为start_position。
+- 当指令中同时出现具体位置（如“点位1”）和物体（如“可乐”）时，导航至该具体位置。
 
 单机长指令样例：
 {json.dumps(SINGLE_ROBOT_TEST_CASES, ensure_ascii=False, indent=2)}
