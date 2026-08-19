@@ -217,8 +217,8 @@ class LongHorizonTextRunner:
             )
             return client, gpt_model
 
-        gpt_model = os.getenv("GPT_MODEL")
-        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv("GPT_BASE_URL") or None)
+        gpt_model = os.getenv("OPENAI_MODEL")
+        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv("OPENAI_BASE_URL") or None)
         return client, gpt_model
 
     def _write_yaml(self, path: Path, data: dict) -> None:
