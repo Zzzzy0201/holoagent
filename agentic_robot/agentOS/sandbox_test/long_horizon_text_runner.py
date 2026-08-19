@@ -193,10 +193,7 @@ class LongHorizonTextRunner:
         gpt_api_key = (
             os.getenv("AZURE_OPENAI_API_KEY")
             if gpt_provider == "azure"
-            # 千问3.7flash
-            #else os.getenv("OPENAI_API_KEY", "sk-ws-H.EPHXPMM.cHeu.MEQCIC2wD6WCXNdbZXblzjubk5-ExUNUshynEDcvawDBVorTAiAS8Xn0UwMNS7Cx2bgoFZt_D4cmReDVI3joEk8XXT6HJg")
-            #千问3.7plus
-            else os.getenv("OPENAI_API_KEY", "sk-ws-H.EPLEYML.PMCe.MEUCIQCslITrqsSR3RbD9smFs30HBbNQaRGtSnKdjA78B5dUwwIgZDIe7mcIV-aYBU-_sf7hdH9BAj6-u3UrkMNKGBmk6qA")
+            else os.getenv("OPENAI_API_KEY")
         )
         if not gpt_api_key:
             raise RuntimeError(
@@ -220,10 +217,8 @@ class LongHorizonTextRunner:
             )
             return client, gpt_model
 
-        #gpt_model = os.getenv("GPT_MODEL", "qwen3.7-flash")
-
-        gpt_model = os.getenv("GPT_MODEL", "qwen3.7-plus")
-        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv("GPT_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1") or None)
+        gpt_model = os.getenv("GPT_MODEL")
+        client = OpenAI(api_key=gpt_api_key, base_url=os.getenv("GPT_BASE_URL") or None)
         return client, gpt_model
 
     def _write_yaml(self, path: Path, data: dict) -> None:
