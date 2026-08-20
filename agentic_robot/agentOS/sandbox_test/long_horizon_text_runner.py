@@ -129,6 +129,7 @@ class LongHorizonTextRunner:
             "mango",
             "blueberry",
             "banana",
+            "orange",
             "basket",
             "cola",
             "coffee",
