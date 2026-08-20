@@ -135,6 +135,8 @@ class LongHorizonTextRunner:
             "coffee",
             "tea",
             "juice",
+            "chips",
+            "chocolate",
             "people_1",
             "people_2",
         }
