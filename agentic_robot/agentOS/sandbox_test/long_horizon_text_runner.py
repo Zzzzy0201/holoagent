@@ -251,6 +251,8 @@ class LongHorizonTextRunner:
                 api_key=gpt_api_key,
                 api_version=azure_api_version,
             )
+            print(f"[DEBUG] GPT Provider: {gpt_provider}, Model: {gpt_model}")  # 添加
+            
             return client, gpt_model
 
         gpt_model = os.getenv("OPENAI_MODEL")
@@ -371,8 +373,6 @@ class LongHorizonTextRunner:
 """
 
     def analyze_instruction(self, instruction: str) -> Optional[dict]:
-        print(f"[DEBUG] analyze_instruction 被调用，指令: {instruction}")  # 添加这行
-        
         self._append_event("instruction_received", {
                            "instruction": instruction})
         try:
