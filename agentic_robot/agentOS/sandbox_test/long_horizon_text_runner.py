@@ -22,6 +22,7 @@ from typing import List, Optional, Set
 import requests
 import yaml
 from openai import AzureOpenAI, OpenAI
+from pathlib import Path
 
 
 DEFAULT_OUTPUT_ROOT = Path(
@@ -255,50 +256,48 @@ class LongHorizonTextRunner:
             subtasks.append(record)
         self._write_yaml(self.monitor_path, self.monitor)
 
-
-    import yaml
-from pathlib import Path
-
-def _load_skill_descriptions(self) -> str:
-    """
-    扫描 ./skills 目录，读取 navigation 和 arm 的 SKILL.md，
-    提取 name 和 description，格式化成给 LLM 看的列表。
-    """
-    skills_dir = Path("./skills")
-    descriptions = []
     
-    # 只读取我们需要的两个技能（也可以全读，但为了验证通过，只取 navigation 和 arm）
-    target_skills = ["navigation", "arm"]
+
+    def _load_skill_descriptions(self) -> str:
+        """
+        扫描 ./skills 目录，读取 navigation 和 arm 的 SKILL.md，
+        提取 name 和 description，格式化成给 LLM 看的列表。
+        """
+        skills_dir = Path(__file__).parent / "skills"
+        descriptions = []
     
-    for skill_name in target_skills:
-        skill_path = skills_dir / skill_name / "SKILL.md"
-        if not skill_path.exists():
-            print(f"[警告] 未找到 {skill_path}，使用默认描述")
-            continue
+        # 只读取我们需要的两个技能（也可以全读，但为了验证通过，只取 navigation 和 arm）
+        target_skills = ["navigation", "arm"]
+    
+        for skill_name in target_skills:
+            skill_path = skills_dir / skill_name / "SKILL.md"
+            if not skill_path.exists():
+                print(f"[警告] 未找到 {skill_path}，使用默认描述")
+                continue
             
-        try:
-            content = skill_path.read_text(encoding="utf-8")
-            if content.startswith("---"):
-                parts = content.split("---", 2)
-                if len(parts) >= 3:
-                    frontmatter = yaml.safe_load(parts[1])
-                    if frontmatter and "name" in frontmatter and "description" in frontmatter:
-                        # 提取描述，并替换掉换行符为空格，让 prompt 更紧凑
-                        desc = frontmatter["description"].replace("\n", " ").strip()
-                        # 同时提取 allowed_targets 让 LLM 知道可填哪些参数
-                        targets = frontmatter.get("allowed_targets", [])
-                        targets_str = f"（允许的目标参数：{', '.join(targets)}）" if targets else ""
-                        descriptions.append(f"- **{frontmatter['name']}**：{desc}{targets_str}")
-        except Exception as e:
-            print(f"[警告] 解析 {skill_path} 失败: {e}")
+            try:
+                content = skill_path.read_text(encoding="utf-8")
+                if content.startswith("---"):
+                    parts = content.split("---", 2)
+                    if len(parts) >= 3:
+                        frontmatter = yaml.safe_load(parts[1])
+                        if frontmatter and "name" in frontmatter and "description" in frontmatter:
+                            # 提取描述，并替换掉换行符为空格，让 prompt 更紧凑
+                            desc = frontmatter["description"].replace("\n", " ").strip()
+                            # 同时提取 allowed_targets 让 LLM 知道可填哪些参数
+                            targets = frontmatter.get("allowed_targets", [])
+                            targets_str = f"（允许的目标参数：{', '.join(targets)}）" if targets else ""
+                            descriptions.append(f"- **{frontmatter['name']}**：{desc}{targets_str}")
+            except Exception as e:
+                print(f"[警告] 解析 {skill_path} 失败: {e}")
     
-    # 如果没读到任何外部技能，回退到硬编码（保证程序不崩溃）
-    if not descriptions:
-        return """
-- **navigation**：控制机器人导航到预设点位（one_point_1~4, stop）。适用于移动指令。
-- **arm**：控制机械臂执行预设动作（wave, clamp, release 等）。适用于手臂动作指令。
-"""
-    return "\n".join(descriptions)
+        # 如果没读到任何外部技能，回退到硬编码（保证程序不崩溃）
+        if not descriptions:
+            return """
+    - **navigation**：控制机器人导航到预设点位（one_point_1~4, stop）。适用于移动指令。
+    - **arm**：控制机械臂执行预设动作（wave, clamp, release 等）。适用于手臂动作指令。
+    """
+        return "\n".join(descriptions)
 
     
 
