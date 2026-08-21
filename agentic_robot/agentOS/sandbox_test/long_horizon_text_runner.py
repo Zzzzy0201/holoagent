@@ -196,7 +196,7 @@ class LongHorizonTextRunner:
 
 
     def _load_skill_registry(self) -> dict:
-       script_dir = Path(__file__).parent
+        script_dir = Path(__file__).parent
         skills_dir = script_dir / "skills"
         registry = {}
 
