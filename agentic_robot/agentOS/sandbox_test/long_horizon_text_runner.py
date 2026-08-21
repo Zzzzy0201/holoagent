@@ -255,7 +255,56 @@ class LongHorizonTextRunner:
             subtasks.append(record)
         self._write_yaml(self.monitor_path, self.monitor)
 
+
+    import yaml
+from pathlib import Path
+
+def _load_skill_descriptions(self) -> str:
+    """
+    扫描 ./skills 目录，读取 navigation 和 arm 的 SKILL.md，
+    提取 name 和 description，格式化成给 LLM 看的列表。
+    """
+    skills_dir = Path("./skills")
+    descriptions = []
+    
+    # 只读取我们需要的两个技能（也可以全读，但为了验证通过，只取 navigation 和 arm）
+    target_skills = ["navigation", "arm"]
+    
+    for skill_name in target_skills:
+        skill_path = ./skills/skill_name/ "SKILL.md"
+        if not skill_path.exists():
+            print(f"[警告] 未找到 {skill_path}，使用默认描述")
+            continue
+            
+        try:
+            content = skill_path.read_text(encoding="utf-8")
+            if content.startswith("---"):
+                parts = content.split("---", 2)
+                if len(parts) >= 3:
+                    frontmatter = yaml.safe_load(parts[1])
+                    if frontmatter and "name" in frontmatter and "description" in frontmatter:
+                        # 提取描述，并替换掉换行符为空格，让 prompt 更紧凑
+                        desc = frontmatter["description"].replace("\n", " ").strip()
+                        # 同时提取 allowed_targets 让 LLM 知道可填哪些参数
+                        targets = frontmatter.get("allowed_targets", [])
+                        targets_str = f"（允许的目标参数：{', '.join(targets)}）" if targets else ""
+                        descriptions.append(f"- **{frontmatter['name']}**：{desc}{targets_str}")
+        except Exception as e:
+            print(f"[警告] 解析 {skill_path} 失败: {e}")
+    
+    # 如果没读到任何外部技能，回退到硬编码（保证程序不崩溃）
+    if not descriptions:
+        return """
+- **navigation**：控制机器人导航到预设点位（one_point_1~4, stop）。适用于移动指令。
+- **arm**：控制机械臂执行预设动作（wave, clamp, release 等）。适用于手臂动作指令。
+"""
+    return "\n".join(descriptions)
+
+    
+
     def _build_system_prompt(self) -> str:
+        skills_table = self._load_skill_descriptions()
+        
         mode_rule = (
             "当前任务模式是 single_robot，只允许规划单个 robot_id 的串行多任务 DAG。"
             if self.mode == "single_robot"
@@ -282,10 +331,8 @@ class LongHorizonTextRunner:
 字段约束：
 - id: 字符串，必须唯一
 - robot_id: 整数,默认为机器人1
-- skill: 只能是 "navigation" 或 "arm"
-- target:
-  - skill="navigation" 时只能是 {sorted(self.supported_navigation_targets)}
-  - skill="arm" 时只能是 {sorted(self.supported_arm_targets)}
+- skill: 只能是 "navigation" 或 "arm",请仔细阅读每个技能的“适用场景”和“使用规则”来判断当前任务需要调用哪个技能。
+- target：必须匹配该技能对应的allowed_targets。
 - depends_on: 字符串数组，没有依赖时必须输出 []
 - “同时”表示并行，不要互相依赖
 - “然后”“之后”“完成后”“到达后”表示建立依赖
@@ -293,17 +340,7 @@ class LongHorizonTextRunner:
 - 如果无法可靠映射，输出 {{"description": "unrecognized", "nodes": []}}
 - {mode_rule}
 
-高级语义分解规则:
-- 当指令包含“拿取”、“取回”、“拿来”、“拿东西”、“取物”、“我想要一个东西”、“给我一个东西” 等含义时，分解必须包含四个串行节点：导航至物体(navigation)->抓取物体(clamp)->导航至目标返回点(navigation)->放下物体(release_arm)。
-- 当指令包含“把物体从A移到B”时，分解为：导航到A → 抓取 → 导航到B → 放下。
-- 指令包含拿取含义时，如果没有指定要拿给谁，则默认拿给当前用户，返回点为用户所在的位置；如果有指定要拿给谁，则返回点为人物所在位置；如果指定拿到哪里，则返回点为该地点。特别地，如果包含“拿回去”、“放回去”、“归位”、“放回原处”等含义时，返回点为物体的默认存放地（即名称为物体的地点）,请不要返回start_position；如果命令为“拿回来”，则返回start_position。
-- 如果一次需要拿取的物品个数超过一件时，需要先拿篮子（navigation,clamp)，并将后续物品都放在篮子里(navigation,clamp,put_in_basket)，然后将篮子交给对象（navigation,release_arm)。注意左右手协调，拿着篮子的时候要用另一只手拿放物体。
-- 注意理解命令中隐含的先后顺序，如“先”、“再”等。
-- 没有明确指定对象时自行理解对象是谁。
-- 默认当前用户所在的位置和“这里”为start_position,默认当前机器人手上没拿东西。
-- 当拿取指令中指定了物品的具体位置（如“点位1的苹果”）时，导航至该具体位置（如“点位1”）。如果没有具体位置，只有指代词“这个”，则导航至用户处。注意：仅当位置词与物品存在直接语法修饰关系时需要运用本条规则。
-- 当指令中没有具体的个数但有模糊数量词（如“些”、“几个”等）时，需要拿的数量大于一个。
-- 当指令中只有拿取任务时，若没有明确说明要分开拿，请根据返回点合并拿取，忽略顺序词和描述的顺序。
+
 
 单机长指令样例：
 {json.dumps(SINGLE_ROBOT_TEST_CASES, ensure_ascii=False, indent=2)}
