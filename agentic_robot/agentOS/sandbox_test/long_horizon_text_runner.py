@@ -398,6 +398,8 @@ class LongHorizonTextRunner:
                                    "reason": "empty_response"})
                 return None
 
+            print(f"[LLM原始响应] {content}")   # 打印 LLM 返回的原始字符串
+            
             dag = json.loads(content)
             normalized = self._validate_and_normalize_dag(dag)
             self._write_yaml(
