@@ -371,6 +371,8 @@ class LongHorizonTextRunner:
 """
 
     def analyze_instruction(self, instruction: str) -> Optional[dict]:
+        print(f"[DEBUG] analyze_instruction 被调用，指令: {instruction}")  # 添加这行
+        
         self._append_event("instruction_received", {
                            "instruction": instruction})
         try:
