@@ -301,7 +301,6 @@ class LongHorizonTextRunner:
     
         if not skills_dir.exists():
             print(f"[警告] 技能目录 {skills_dir} 不存在")
-            return self._get_default_skill_descriptions()
     
         for skill_path in skills_dir.rglob("SKILL.md"):
             try:
