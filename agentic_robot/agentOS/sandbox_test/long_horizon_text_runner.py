@@ -352,8 +352,8 @@ class LongHorizonTextRunner:
 字段约束：
 - id: 字符串，必须唯一
 - robot_id: 整数,默认为机器人1
-- skill: 只能是 "navigation" 或 "arm",请仔细阅读每个技能的“适用场景”和“使用规则”来判断当前任务需要调用哪个技能。
-- target：必须匹配该技能对应的allowed_targets。
+- skill: 只能是“arm”或"navigation", 请仔细阅读每个技能的“适用场景”和“使用规则”来判断当前任务需要调用哪个技能。
+- target：只能从对应技能下方列出的"allowed_targets"中选择一个，禁止使用不再该列表中的词。
 - depends_on: 字符串数组，没有依赖时必须输出 []
 - “同时”表示并行，不要互相依赖
 - “然后”“之后”“完成后”“到达后”表示建立依赖
