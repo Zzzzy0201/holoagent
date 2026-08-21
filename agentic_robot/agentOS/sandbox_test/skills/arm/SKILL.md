@@ -11,6 +11,7 @@ description: |
   
 allowed_targets:
  - wave_above_head
+ - wave_under_head
  - high_five
  - hug
  - shake_hand
