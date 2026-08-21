@@ -201,7 +201,7 @@ class LongHorizonTextRunner:
         registry = {}
 
         if not skills_dir.exists():
-            print(f"[警告] 技能目录 {skills_dir} 不存在，使用默认技能")
+            print(f"[警告] 技能目录 {skills_dir} 不存在")
 
         for skill_path in skills_dir.rglob("SKILL.md"):
             try:
@@ -220,7 +220,7 @@ class LongHorizonTextRunner:
                 print(f"[警告] 解析 {skill_path} 失败: {e}")
 
         if not registry:
-            print("[警告] 未加载到任何外部技能，使用默认技能")
+            print("[警告] 未加载到任何外部技能")
 
         return registry
 
@@ -343,7 +343,7 @@ class LongHorizonTextRunner:
       "id": "r11_nav_p1",
       "robot_id": 11,
       "skill": "navigation",
-      "target": "point_1",
+      "target": "one_point_1",
       "depends_on": []
     }}
   ]
