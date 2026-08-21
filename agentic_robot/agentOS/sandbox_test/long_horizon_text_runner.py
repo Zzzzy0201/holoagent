@@ -271,7 +271,7 @@ def _load_skill_descriptions(self) -> str:
     target_skills = ["navigation", "arm"]
     
     for skill_name in target_skills:
-        skill_path = ./skills/skill_name/ "SKILL.md"
+        skill_path = skills_dir / skill_name / "SKILL.md"
         if not skill_path.exists():
             print(f"[警告] 未找到 {skill_path}，使用默认描述")
             continue
