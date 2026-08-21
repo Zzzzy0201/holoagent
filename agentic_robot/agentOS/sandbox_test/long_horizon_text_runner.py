@@ -295,7 +295,7 @@ class LongHorizonTextRunner:
         扫描 ./skills 目录，读取 navigation 和 arm 的 SKILL.md，
         提取 name 和 description，格式化成给 LLM 看的列表。
         """
-        skills_dir = Path(__file__).parent / "skills"
+        script_dir = Path(__file__).parent / "skills"
         skills_dir = script_dir / "skills"
         descriptions = []
     
