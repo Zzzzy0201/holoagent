@@ -95,6 +95,8 @@ class LongHorizonTextRunner:
         self.output_root = output_root or DEFAULT_OUTPUT_ROOT
         self.output_root.mkdir(parents=True, exist_ok=True)
 
+        self.skill_registry = self._load_skill_registry() 
+
         self.session_datetime = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.session_dir = self.output_root / \
             f"{self.mode}_{self.session_datetime}"
@@ -264,17 +266,14 @@ class LongHorizonTextRunner:
         提取 name 和 description，格式化成给 LLM 看的列表。
         """
         skills_dir = Path(__file__).parent / "skills"
+        skills_dir = script_dir / "skills"
         descriptions = []
     
-        # 只读取我们需要的两个技能（也可以全读，但为了验证通过，只取 navigation 和 arm）
-        target_skills = ["navigation", "arm"]
+        if not skills_dir.exists():
+            print(f"[警告] 技能目录 {skills_dir} 不存在")
+            return self._get_default_skill_descriptions()
     
-        for skill_name in target_skills:
-            skill_path = skills_dir / skill_name / "SKILL.md"
-            if not skill_path.exists():
-                print(f"[警告] 未找到 {skill_path}，使用默认描述")
-                continue
-            
+        for skill_path in skills_dir.rglob("SKILL.md"):
             try:
                 content = skill_path.read_text(encoding="utf-8")
                 if content.startswith("---"):
@@ -282,21 +281,15 @@ class LongHorizonTextRunner:
                     if len(parts) >= 3:
                         frontmatter = yaml.safe_load(parts[1])
                         if frontmatter and "name" in frontmatter and "description" in frontmatter:
-                            # 提取描述，并替换掉换行符为空格，让 prompt 更紧凑
+                            name = frontmatter["name"]
                             desc = frontmatter["description"].replace("\n", " ").strip()
-                            # 同时提取 allowed_targets 让 LLM 知道可填哪些参数
                             targets = frontmatter.get("allowed_targets", [])
-                            targets_str = f"（允许的目标参数：{', '.join(targets)}）" if targets else ""
-                            descriptions.append(f"- **{frontmatter['name']}**：{desc}{targets_str}")
-            except Exception as e:
+                            targets_str = f"（允许的目标：{', '.join(targets)}）" if targets else ""
+                            descriptions.append(f"- **{name}**：{desc}{targets_str}")
+                            print(f"[加载技能] {name}")
+           except Exception as e:
                 print(f"[警告] 解析 {skill_path} 失败: {e}")
     
-        # 如果没读到任何外部技能，回退到硬编码（保证程序不崩溃）
-        if not descriptions:
-            return """
-    - **navigation**：控制机器人导航到预设点位（one_point_1~4, stop）。适用于移动指令。
-    - **arm**：控制机械臂执行预设动作（wave, clamp, release 等）。适用于手臂动作指令。
-    """
         return "\n".join(descriptions)
 
     
@@ -430,11 +423,14 @@ class LongHorizonTextRunner:
 
             # if robot_id not in self.robot_urls:
             #     return None
-            if skill not in {"navigation", "arm"}:
+            if skill not in self.skill_registry:
+                print(f"[验证失败] 未知技能: {skill}，可用技能: {list(self.skill_registry.keys())}")
                 return None
-            if skill == "navigation" and target not in self.supported_navigation_targets:
-                return None
-            if skill == "arm" and target not in self.supported_arm_targets:
+        
+            # 检查 target 是否在该技能允许的列表中
+            allowed = self.skill_registry[skill].get("allowed_targets", [])
+            if allowed and target not in allowed:
+                print(f"[验证失败] 技能 {skill} 不允许目标 {target}，允许: {allowed}")
                 return None
             if not isinstance(depends_on, list):
                 return None
