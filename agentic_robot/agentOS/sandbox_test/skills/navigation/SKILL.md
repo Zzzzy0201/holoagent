@@ -1,6 +1,6 @@
 ---
 name:navigation
-description:|
+description: |
  控制机器人从当前位置导航到预设点位。
  **适用场景：**
  - 用户明确说明去某个点位，如“去点位1”。
