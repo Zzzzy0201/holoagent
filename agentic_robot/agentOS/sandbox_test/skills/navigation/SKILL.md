@@ -12,10 +12,10 @@ description: |
   - 如果用户指明了物品的具体位置（如“点位1的苹果”），导航至该具体位置（如“点位1”）。注意：当且仅当位置词与物品存在直接语法修饰关系时需要运用本条规则。
   - 本技能只负责移动，并不包含夹取等手部动作。
 allowed_targets:
- - point_1
- - point_2
- - point_3
- - point_4
+ - one_point_1
+ - one_point_2
+ - one_point_3
+ - one_point_4
  - user
  - people_1
  - people_2
