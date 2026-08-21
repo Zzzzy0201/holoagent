@@ -194,6 +194,36 @@ class LongHorizonTextRunner:
         }
         self._write_yaml(self.monitor_path, self.monitor)
 
+
+    def _load_skill_registry(self) -> dict:
+       script_dir = Path(__file__).parent
+        skills_dir = script_dir / "skills"
+        registry = {}
+
+        if not skills_dir.exists():
+            print(f"[警告] 技能目录 {skills_dir} 不存在，使用默认技能")
+
+        for skill_path in skills_dir.rglob("SKILL.md"):
+            try:
+                content = skill_path.read_text(encoding="utf-8")
+                if content.startswith("---"):
+                    parts = content.split("---", 2)
+                    if len(parts) >= 3:
+                        frontmatter = yaml.safe_load(parts[1])
+                        if frontmatter and "name" in frontmatter:
+                            name = frontmatter["name"]
+                            registry[name] = {
+                                "description": frontmatter.get("description", "").replace("\n", " ").strip(),
+                                "allowed_targets": frontmatter.get("allowed_targets", [])
+                            }
+            except Exception as e:
+                print(f"[警告] 解析 {skill_path} 失败: {e}")
+
+        if not registry:
+            print("[警告] 未加载到任何外部技能，使用默认技能")
+
+        return registry
+
     def _build_llm_client(self):
         gpt_provider = os.getenv("GPT_PROVIDER", "openai").strip().lower()
         gpt_api_key = (
