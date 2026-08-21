@@ -287,7 +287,7 @@ class LongHorizonTextRunner:
                             targets_str = f"（允许的目标：{', '.join(targets)}）" if targets else ""
                             descriptions.append(f"- **{name}**：{desc}{targets_str}")
                             print(f"[加载技能] {name}")
-           except Exception as e:
+            except Exception as e:
                 print(f"[警告] 解析 {skill_path} 失败: {e}")
     
         return "\n".join(descriptions)
