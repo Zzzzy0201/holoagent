@@ -225,6 +225,8 @@ class LongHorizonTextRunner:
         return registry
 
     def _build_llm_client(self):
+        print("[DEBUG] _build_llm_client 被调用")  # 添加
+        
         gpt_provider = os.getenv("GPT_PROVIDER", "openai").strip().lower()
         gpt_api_key = (
             os.getenv("AZURE_OPENAI_API_KEY")
@@ -251,8 +253,6 @@ class LongHorizonTextRunner:
                 api_key=gpt_api_key,
                 api_version=azure_api_version,
             )
-            print(f"[DEBUG] GPT Provider: {gpt_provider}, Model: {gpt_model}")  # 添加
-            
             return client, gpt_model
 
         gpt_model = os.getenv("OPENAI_MODEL")
