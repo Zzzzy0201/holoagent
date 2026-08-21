@@ -8,6 +8,7 @@ description: |
  **使用规则：**
   - 如果用户指令中包含“拿给我”、“我想要”等含义时，需在完成导航到目标点之后，调用本skill。如果需要一次拿超过一件物品，请先去抓取篮子，再去抓取物品放入篮子。
   - 禁止同一个机器人同一只手连续抓取两次。
+  - 从以下allowed_targets选择一个target,如果没有特别要求，默认使用clamp_right。
 allowed_targets:
  - clamp_left
  - clamp_right
